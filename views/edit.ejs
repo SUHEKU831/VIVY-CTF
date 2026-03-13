@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Edit Challenge</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+<div class="navbar">
+<h2>⚡ VIVY CTF</h2>
+<a href="/admin">Back</a>
+</div>
+
+<div class="container">
+
+<h1>Edit Challenge</h1>
+
+<form method="POST" enctype="multipart/form-data" class="admin-form">
+
+<input name="title" value="<%= chall.title %>">
+
+<input name="category" value="<%= chall.category %>">
+
+<input name="points" value="<%= chall.points %>">
+
+<textarea name="description"><%= chall.description %></textarea>
+
+<input type="file" name="file">
+
+<button>Update Challenge</button>
+
+</form>
+
+</div>
+
+</body>
+</html>
