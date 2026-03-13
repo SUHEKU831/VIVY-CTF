@@ -2,19 +2,27 @@ body{
 background:black;
 color:#00ff00;
 font-family:monospace;
+padding:40px;
 }
 
-a{
-color:#00ff00;
-}
-
-input{
+input,textarea{
 background:black;
 border:1px solid #00ff00;
 color:#00ff00;
+display:block;
+margin:10px 0;
 }
 
 button{
 background:#00ff00;
 color:black;
+padding:5px;
+}
+
+table{
+border:1px solid #00ff00;
+}
+
+td,th{
+padding:10px;
 }
