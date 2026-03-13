@@ -1,14 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Login - VIVY CTF</title>
 <link rel="stylesheet" href="/css/style.css">
+</head>
 
-<h2>Login</h2>
+<body>
 
-<form method="POST">
+<div class="login-container">
 
-<input name="username" placeholder="username">
-<input name="password" type="password" placeholder="password">
+<div class="login-card">
 
-<button>Login</button>
+<h2 class="login-title">⚡ VIVY CTF Login</h2>
+
+<form method="POST" class="login-form">
+
+<input name="username" placeholder="Username" required>
+
+<input name="password" type="password" placeholder="Password" required>
+
+<button class="submit-btn">Login</button>
 
 </form>
 
-<a href="/register">Register</a>
+<p class="register-link">
+No account? <a href="/register">Register</a>
+</p>
+
+</div>
+
+</div>
+
+</body>
+</html>
