@@ -1,6 +1,11 @@
 const sqlite3 = require("sqlite3").verbose()
 
-const db = new sqlite3.Database("./database.db")
+const path = require("path")
+const sqlite3 = require("sqlite3").verbose()
+
+const dbPath = path.join(__dirname,"database.db")
+
+const db = new sqlite3.Database(dbPath)
 
 db.serialize(()=>{
 
