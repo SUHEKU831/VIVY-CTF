@@ -18,10 +18,12 @@ resave:false,
 saveUninitialized:false
 }))
 
+// Routes
 app.use("/",require("./routes/auth"))
 app.use("/challenge",require("./routes/challenge"))
 app.use("/admin",require("./routes/admin"))
 app.use("/scoreboard",require("./routes/scoreboard"))
+app.use("/profile",require("./routes/profile")) // TAMBAHKAN INI
 
 const PORT = process.env.PORT || 3000
 
