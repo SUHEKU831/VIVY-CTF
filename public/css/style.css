@@ -1,0 +1,20 @@
+body{
+background:black;
+color:#00ff00;
+font-family:monospace;
+}
+
+a{
+color:#00ff00;
+}
+
+input{
+background:black;
+border:1px solid #00ff00;
+color:#00ff00;
+}
+
+button{
+background:#00ff00;
+color:black;
+}
