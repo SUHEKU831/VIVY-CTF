@@ -1,0 +1,27 @@
+<link rel="stylesheet" href="/css/style.css">
+
+<h1>Challenges</h1>
+
+<a href="/scoreboard">Scoreboard</a>
+
+<% challs.forEach(c=>{ %>
+
+<div>
+
+<h3><%= c.title %> (<%= c.points %>)</h3>
+
+<p><%= c.description %></p>
+
+<form method="POST" action="/challenge/submit">
+
+<input type="hidden" name="id" value="<%= c.id %>">
+
+<input name="flag" placeholder="flag">
+
+<button>Submit</button>
+
+</form>
+
+</div>
+
+<% }) %>
