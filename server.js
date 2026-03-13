@@ -1,6 +1,7 @@
 const express = require("express")
 const session = require("express-session")
 const bodyParser = require("body-parser")
+const path = require("path")
 
 const app = express()
 
@@ -8,7 +9,6 @@ require("./database")
 
 app.set("view engine","ejs")
 
-const path = require("path")
 app.use(express.static(path.join(__dirname,"public")))
 app.use(bodyParser.urlencoded({extended:true}))
 
