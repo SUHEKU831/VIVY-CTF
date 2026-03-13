@@ -173,3 +173,38 @@ border-bottom:1px solid #00ff9c22;
 .score-table tr:hover{
 background:#00ff9c11;
 }
+
+/* ALERT NOTIFICATION */
+
+.alert{
+padding:15px;
+margin-bottom:20px;
+border-radius:6px;
+font-weight:bold;
+text-align:center;
+animation:fadein .4s ease;
+}
+
+.alert.success{
+background:#022c22;
+border:1px solid #00ff9c;
+color:#00ff9c;
+box-shadow:0 0 10px #00ff9c;
+}
+
+.alert.error{
+background:#2c0202;
+border:1px solid #ff4d4d;
+color:#ff4d4d;
+box-shadow:0 0 10px #ff4d4d;
+}
+
+@keyframes fadein{
+from{
+opacity:0;
+transform:translateY(-10px);
+}
+to{
+opacity:1;
+}
+}
