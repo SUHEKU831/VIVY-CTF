@@ -1,0 +1,21 @@
+<link rel="stylesheet" href="/css/style.css">
+
+<h1>Scoreboard</h1>
+
+<table>
+
+<tr>
+<th>User</th>
+<th>Score</th>
+</tr>
+
+<% users.forEach(u=>{ %>
+
+<tr>
+<td><%= u.username %></td>
+<td><%= u.score %></td>
+</tr>
+
+<% }) %>
+
+</table>
