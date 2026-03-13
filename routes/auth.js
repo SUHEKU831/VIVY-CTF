@@ -27,6 +27,7 @@ if(!valid) return res.send("Wrong password")
 req.session.user = user
 
 res.redirect("/challenge")
+
 })
 
 })
@@ -44,7 +45,7 @@ const hash = await bcrypt.hash(password,10)
 db.run(
 "INSERT INTO users(username,password) VALUES(?,?)",
 [username,hash],
-()=>{ res.redirect("/login") }
+()=> res.redirect("/login")
 )
 
 })
