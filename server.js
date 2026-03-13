@@ -14,6 +14,8 @@ const io = new Server(server)
 
 const db = new sqlite3.Database("database.db")
 
+/* ================= CONFIG ================= */
+
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended:true}))
 
@@ -26,7 +28,13 @@ saveUninitialized:true
 app.use(express.static("public"))
 app.use("/files",express.static("challenges"))
 
-if(!fs.existsSync("challenges")) fs.mkdirSync("challenges")
+/* ================= FOLDER ================= */
+
+if(!fs.existsSync("challenges")){
+fs.mkdirSync("challenges")
+}
+
+/* ================= HASH ================= */
 
 function hashFlag(flag){
 return crypto.createHash("sha256").update(flag).digest("hex")
@@ -72,7 +80,7 @@ VALUES('admin','admin123',1)
 
 })
 
-/* ================= SOCKET ================= */
+/* ================= SCOREBOARD ================= */
 
 function updateScoreboard(){
 db.all("SELECT username,score FROM users ORDER BY score DESC",(err,rows)=>{
@@ -81,11 +89,18 @@ io.emit("scoreboard",rows)
 }
 
 function checkFirstBlood(challenge){
-db.get("SELECT * FROM solves WHERE challenge=?", [challenge], (err,row)=>{
+
+db.get(
+"SELECT * FROM solves WHERE challenge=?",
+[challenge],
+(err,row)=>{
+
 if(!row){
 io.emit("firstblood",challenge)
 }
+
 })
+
 }
 
 /* ================= AUTH ================= */
@@ -98,8 +113,13 @@ db.run(
 "INSERT INTO users(username,password) VALUES(?,?)",
 [username,password],
 (err)=>{
-if(err) return res.send("User exists")
+
+if(err){
+return res.send("User already exists")
+}
+
 res.redirect("/login.html")
+
 })
 
 })
@@ -130,13 +150,21 @@ req.session.destroy()
 res.redirect("/login.html")
 })
 
-/* ================= CHALLENGES ================= */
+/* ================= GET CHALLENGES ================= */
 
 app.get("/challenges",(req,res)=>{
-db.all("SELECT id,name,points FROM challenges",(err,rows)=>{
+
+db.all(
+"SELECT id,name,points FROM challenges",
+(err,rows)=>{
+
 res.json(rows)
+
 })
+
 })
+
+/* ================= DESCRIPTION ================= */
 
 app.get("/description/:id",(req,res)=>{
 
@@ -150,21 +178,26 @@ res.send("No description")
 
 })
 
-/* ================= FLAG SUBMIT ================= */
+/* ================= SUBMIT FLAG ================= */
 
 app.post("/submit",(req,res)=>{
 
-if(!req.session.user) return res.send("Login first")
+if(!req.session.user){
+return res.send("Login first")
+}
 
 const {challenge,flag}=req.body
 
 const hash=hashFlag(flag)
 
-db.get("SELECT * FROM challenges WHERE id=?",
+db.get(
+"SELECT * FROM challenges WHERE id=?",
 [challenge],
 (err,row)=>{
 
-if(!row) return res.send("Challenge not found")
+if(!row){
+return res.send("Challenge not found")
+}
 
 if(hash!==row.flag_hash){
 return res.send("Wrong flag")
@@ -175,7 +208,9 @@ db.get(
 [req.session.user,challenge],
 (err,solved)=>{
 
-if(solved) return res.send("Already solved")
+if(solved){
+return res.send("Already solved")
+}
 
 db.run(
 "INSERT INTO solves(username,challenge) VALUES(?,?)",
@@ -200,7 +235,7 @@ res.send("Correct flag")
 
 })
 
-/* ================= ADMIN PANEL ================= */
+/* ================= ADMIN ================= */
 
 function adminOnly(req,res,next){
 
@@ -212,30 +247,35 @@ next()
 
 }
 
-/* upload config */
+/* ================= UPLOAD ================= */
 
 const storage = multer.diskStorage({
 
 destination:(req,file,cb)=>{
 
 const id=req.body.id
+
 const dir="challenges/"+id
 
-if(!fs.existsSync(dir)) fs.mkdirSync(dir)
+if(!fs.existsSync(dir)){
+fs.mkdirSync(dir)
+}
 
 cb(null,dir)
 
 },
 
 filename:(req,file,cb)=>{
+
 cb(null,file.originalname)
+
 }
 
 })
 
 const upload = multer({storage})
 
-/* add challenge */
+/* ================= ADD CHALLENGE ================= */
 
 app.post("/admin/add",adminOnly,upload.single("file"),(req,res)=>{
 
@@ -252,7 +292,7 @@ const descPath="challenges/"+id+"/description.txt"
 
 fs.writeFileSync(descPath,description)
 
-res.send("Challenge added")
+res.send("Challenge added successfully")
 
 })
 
@@ -262,8 +302,10 @@ io.on("connection",socket=>{
 updateScoreboard()
 })
 
-/* ================= START ================= */
+/* ================= START SERVER ================= */
 
-server.listen(3000,()=>{
-console.log("CTF running on port 3000")
+const PORT = process.env.PORT || 3000
+
+server.listen(PORT,()=>{
+console.log("CTF running on port "+PORT)
 })
