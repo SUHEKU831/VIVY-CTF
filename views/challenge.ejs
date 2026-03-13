@@ -16,6 +16,12 @@
 
 <h1 class="title">Challenges</h1>
 
+<% if(message){ %>
+<div class="alert <%= type %>">
+<%= message %>
+</div>
+<% } %>
+
 <% challs.forEach(c=>{ %>
 
 <div class="card">
@@ -42,6 +48,17 @@
 <% }) %>
 
 </div>
+
+<script>
+setTimeout(function(){
+  const alert = document.querySelector('.alert');
+  if(alert){
+    alert.style.transition = "opacity 0.5s";
+    alert.style.opacity = "0";
+    setTimeout(()=> alert.remove(), 500);
+  }
+},3000);
+</script>
 
 </body>
 </html>
