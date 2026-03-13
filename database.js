@@ -9,7 +9,6 @@ const db = new sqlite3.Database(dbPath)
 db.serialize(()=>{
 
 /* USERS TABLE */
-
 db.run(`
 CREATE TABLE IF NOT EXISTS users(
 id INTEGER PRIMARY KEY,
@@ -20,8 +19,7 @@ isAdmin INTEGER DEFAULT 0
 )
 `)
 
-/* CHALLENGE TABLE */
-
+/* CHALLENGE TABLE - DITAMBAH KOLOM FILE */
 db.run(`
 CREATE TABLE IF NOT EXISTS challenges(
 id INTEGER PRIMARY KEY,
@@ -29,12 +27,12 @@ title TEXT,
 description TEXT,
 flag_hash TEXT,
 points INTEGER,
-category TEXT
+category TEXT,
+file TEXT   /* ← KOLOM BARU UNTUK MENYIMPAN NAMA FILE */
 )
 `)
 
 /* SOLVES TABLE */
-
 db.run(`
 CREATE TABLE IF NOT EXISTS solves(
 id INTEGER PRIMARY KEY,
@@ -44,7 +42,6 @@ challenge_id INTEGER
 `)
 
 /* AUTO CREATE ADMIN */
-
 db.get("SELECT * FROM users WHERE username='admin'", async (err,row)=>{
 
 if(!row){
