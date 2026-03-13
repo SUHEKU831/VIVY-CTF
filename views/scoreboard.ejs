@@ -1,17 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Scoreboard</title>
 <link rel="stylesheet" href="/css/style.css">
+</head>
 
-<h1>Scoreboard</h1>
+<body>
 
-<table>
+<div class="navbar">
+<h2>⚡ VIVY CTF</h2>
+<a href="/challenge">Challenges</a>
+</div>
+
+<div class="container">
+
+<h1 class="title">🏆 Scoreboard</h1>
+
+<div class="card">
+
+<table class="score-table">
 
 <tr>
+<th>#</th>
 <th>User</th>
 <th>Score</th>
 </tr>
 
-<% users.forEach(u=>{ %>
+<% users.forEach((u,i)=>{ %>
 
 <tr>
+<td><%= i+1 %></td>
 <td><%= u.username %></td>
 <td><%= u.score %></td>
 </tr>
@@ -19,3 +37,10 @@
 <% }) %>
 
 </table>
+
+</div>
+
+</div>
+
+</body>
+</html>
