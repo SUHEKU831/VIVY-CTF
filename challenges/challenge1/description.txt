@@ -1,1 +1,0 @@
-Find the hidden flag inside the zip file.
