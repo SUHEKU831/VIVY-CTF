@@ -1,13 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Login | Mini CTF</title>
+<link rel="stylesheet" href="style.css">
+</head>
 
-<h2>Login</h2>
+<body>
+
+<div class="form-box">
+
+<h2>CTF LOGIN</h2>
 
 <form action="/login" method="POST">
 
-<input name="username" placeholder="username"><br>
-<input name="password" placeholder="password"><br>
+<input name="username" placeholder="username" required>
 
-<button>Login</button>
+<input type="password" name="password" placeholder="password" required>
+
+<button>LOGIN</button>
 
 </form>
 
+<p>Don't have account?</p>
+
 <a href="/register.html">Register</a>
+
+</div>
+
+</body>
+</html>
