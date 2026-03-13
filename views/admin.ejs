@@ -1,17 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Admin Panel</title>
 <link rel="stylesheet" href="/css/style.css">
+</head>
 
-<h1>Admin Panel</h1>
+<body>
 
-<form method="POST" action="/admin/add">
+<div class="navbar">
+<h2>⚡ VIVY CTF</h2>
+<a href="/challenge">Challenges</a>
+<a href="/scoreboard">Scoreboard</a>
+</div>
 
-<input name="title" placeholder="title">
-<input name="category" placeholder="category">
-<input name="points" placeholder="points">
+<div class="container">
 
-<textarea name="description"></textarea>
+<h1 class="title">Admin Panel</h1>
 
-<input name="flag" placeholder="flag">
+<div class="card">
 
-<button>Add Challenge</button>
+<h3>Add Challenge</h3>
+
+<form method="POST" action="/admin/add" class="admin-form">
+
+<input name="title" placeholder="Challenge title" required>
+
+<input name="category" placeholder="Category (web, crypto, pwn)" required>
+
+<input name="points" placeholder="Points" type="number" required>
+
+<textarea name="description" placeholder="Challenge description"></textarea>
+
+<input name="flag" placeholder="Flag (example: CTF{flag})" required>
+
+<button class="submit-btn">Add Challenge</button>
 
 </form>
+
+</div>
+
+</div>
+
+</body>
+</html>
