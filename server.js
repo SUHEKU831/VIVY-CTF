@@ -6,6 +6,7 @@ const http = require("http")
 const {Server} = require("socket.io")
 const crypto = require("crypto")
 const fs = require("fs")
+const multer = require("multer")
 
 const app = express()
 const server = http.createServer(app)
@@ -25,9 +26,13 @@ saveUninitialized:true
 app.use(express.static("public"))
 app.use("/files",express.static("challenges"))
 
+if(!fs.existsSync("challenges")) fs.mkdirSync("challenges")
+
 function hashFlag(flag){
 return crypto.createHash("sha256").update(flag).digest("hex")
 }
+
+/* ================= DATABASE ================= */
 
 db.serialize(()=>{
 
@@ -36,7 +41,8 @@ CREATE TABLE IF NOT EXISTS users(
 id INTEGER PRIMARY KEY,
 username TEXT UNIQUE,
 password TEXT,
-score INTEGER DEFAULT 0
+score INTEGER DEFAULT 0,
+admin INTEGER DEFAULT 0
 )
 `)
 
@@ -57,41 +63,16 @@ challenge TEXT
 )
 `)
 
-/* =========================
-DEFAULT CHALLENGES
-========================= */
+/* default admin */
 
-db.run(
-"INSERT OR IGNORE INTO challenges(id,name,points,flag_hash) VALUES(?,?,?,?)",
-[
-"crypto1",
-"Easy Crypto",
-100,
-hashFlag("ctf{base64_easy}")
-]
-)
-
-db.run(
-"INSERT OR IGNORE INTO challenges(id,name,points,flag_hash) VALUES(?,?,?,?)",
-[
-"forensics1",
-"Hidden Data",
-150,
-hashFlag("ctf{stego_secret}")
-]
-)
-
-db.run(
-"INSERT OR IGNORE INTO challenges(id,name,points,flag_hash) VALUES(?,?,?,?)",
-[
-"web1",
-"Hidden Panel",
-200,
-hashFlag("ctf{admin_panel_found}")
-]
-)
+db.run(`
+INSERT OR IGNORE INTO users(username,password,admin)
+VALUES('admin','admin123',1)
+`)
 
 })
+
+/* ================= SOCKET ================= */
 
 function updateScoreboard(){
 db.all("SELECT username,score FROM users ORDER BY score DESC",(err,rows)=>{
@@ -100,23 +81,14 @@ io.emit("scoreboard",rows)
 }
 
 function checkFirstBlood(challenge){
-
-db.get(
-"SELECT * FROM solves WHERE challenge=?",
-[challenge],
-(err,row)=>{
-
+db.get("SELECT * FROM solves WHERE challenge=?", [challenge], (err,row)=>{
 if(!row){
 io.emit("firstblood",challenge)
 }
-
 })
-
 }
 
-/* =========================
-REGISTER
-========================= */
+/* ================= AUTH ================= */
 
 app.post("/register",(req,res)=>{
 
@@ -126,18 +98,11 @@ db.run(
 "INSERT INTO users(username,password) VALUES(?,?)",
 [username,password],
 (err)=>{
-
-if(err) return res.send("User already exists")
-
+if(err) return res.send("User exists")
 res.redirect("/login.html")
-
 })
 
 })
-
-/* =========================
-LOGIN
-========================= */
 
 app.post("/login",(req,res)=>{
 
@@ -149,7 +114,8 @@ db.get(
 (err,row)=>{
 
 if(row){
-req.session.user=username
+req.session.user=row.username
+req.session.admin=row.admin
 res.redirect("/")
 }else{
 res.send("Login failed")
@@ -159,32 +125,18 @@ res.send("Login failed")
 
 })
 
-/* =========================
-LOGOUT
-========================= */
-
 app.get("/logout",(req,res)=>{
 req.session.destroy()
 res.redirect("/login.html")
 })
 
-/* =========================
-GET CHALLENGES
-========================= */
+/* ================= CHALLENGES ================= */
 
 app.get("/challenges",(req,res)=>{
-
-db.all(
-"SELECT id,name,points FROM challenges",
-(err,rows)=>{
+db.all("SELECT id,name,points FROM challenges",(err,rows)=>{
 res.json(rows)
 })
-
 })
-
-/* =========================
-CHALLENGE DESCRIPTION
-========================= */
 
 app.get("/description/:id",(req,res)=>{
 
@@ -198,9 +150,7 @@ res.send("No description")
 
 })
 
-/* =========================
-SUBMIT FLAG
-========================= */
+/* ================= FLAG SUBMIT ================= */
 
 app.post("/submit",(req,res)=>{
 
@@ -210,15 +160,14 @@ const {challenge,flag}=req.body
 
 const hash=hashFlag(flag)
 
-db.get(
-"SELECT * FROM challenges WHERE id=?",
+db.get("SELECT * FROM challenges WHERE id=?",
 [challenge],
 (err,row)=>{
 
 if(!row) return res.send("Challenge not found")
 
 if(hash!==row.flag_hash){
-return res.send("Wrong flag ❌")
+return res.send("Wrong flag")
 }
 
 db.get(
@@ -243,7 +192,7 @@ updateScoreboard()
 
 })
 
-res.send("Correct flag 🎉")
+res.send("Correct flag")
 
 })
 
@@ -251,17 +200,69 @@ res.send("Correct flag 🎉")
 
 })
 
-/* =========================
-SOCKET.IO
-========================= */
+/* ================= ADMIN PANEL ================= */
+
+function adminOnly(req,res,next){
+
+if(!req.session.admin){
+return res.send("Admin only")
+}
+
+next()
+
+}
+
+/* upload config */
+
+const storage = multer.diskStorage({
+
+destination:(req,file,cb)=>{
+
+const id=req.body.id
+const dir="challenges/"+id
+
+if(!fs.existsSync(dir)) fs.mkdirSync(dir)
+
+cb(null,dir)
+
+},
+
+filename:(req,file,cb)=>{
+cb(null,file.originalname)
+}
+
+})
+
+const upload = multer({storage})
+
+/* add challenge */
+
+app.post("/admin/add",adminOnly,upload.single("file"),(req,res)=>{
+
+const {id,name,points,flag,description}=req.body
+
+const flaghash=hashFlag(flag)
+
+db.run(
+"INSERT INTO challenges(id,name,points,flag_hash) VALUES(?,?,?,?)",
+[id,name,points,flaghash]
+)
+
+const descPath="challenges/"+id+"/description.txt"
+
+fs.writeFileSync(descPath,description)
+
+res.send("Challenge added")
+
+})
+
+/* ================= SOCKET ================= */
 
 io.on("connection",socket=>{
 updateScoreboard()
 })
 
-/* =========================
-START SERVER
-========================= */
+/* ================= START ================= */
 
 server.listen(3000,()=>{
 console.log("CTF running on port 3000")
