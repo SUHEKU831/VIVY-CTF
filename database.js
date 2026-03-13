@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS challenges(
 id INTEGER PRIMARY KEY,
 title TEXT,
 description TEXT,
-flag TEXT,
+flag_hash TEXT,
 points INTEGER,
 category TEXT
 )
