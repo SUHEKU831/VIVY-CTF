@@ -1,0 +1,57 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>VIVY CTF</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<nav>
+<h2>VIVY CTF</h2>
+
+<div class="menu">
+<a href="/">Challenges</a>
+<a href="/scoreboard.html">Scoreboard</a>
+<a href="/login.html">Login</a>
+</div>
+</nav>
+
+<div class="container">
+
+<h1>Challenges</h1>
+
+<div id="list"></div>
+
+</div>
+
+<script>
+
+fetch("/challenges")
+.then(r=>r.json())
+.then(data=>{
+
+const list=document.getElementById("list")
+
+data.forEach(c=>{
+
+const div=document.createElement("div")
+div.className="challenge"
+
+div.innerHTML=`
+<h3>${c.name}</h3>
+<p>Points: ${c.points}</p>
+<a href="/challenge.html?id=${c.id}"><button>Open</button></a>
+`
+
+list.appendChild(div)
+
+})
+
+})
+
+</script>
+
+</body>
+</html>
