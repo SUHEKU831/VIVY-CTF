@@ -9,7 +9,11 @@ router.get("/",auth,(req,res)=>{
 
 db.all("SELECT * FROM challenges",(err,challs)=>{
 
-res.render("challenge",{challs})
+res.render("challenge",{
+challs:challs,
+message:null,
+type:null
+})
 
 })
 
@@ -26,7 +30,7 @@ const hash = crypto
 
 db.get("SELECT * FROM challenges WHERE id=?",[id],(err,chall)=>{
 
-if(!chall) return res.send("Invalid challenge")
+if(!chall) return res.redirect("/challenge")
 
 if(hash === chall.flag_hash){
 
@@ -35,7 +39,17 @@ db.get(
 [req.session.user.id,id],
 (err,row)=>{
 
-if(row) return res.send("Already solved")
+db.all("SELECT * FROM challenges",(err,challs)=>{
+
+if(row){
+
+return res.render("challenge",{
+challs:challs,
+message:"⚠ Already solved",
+type:"error"
+})
+
+}
 
 db.run(
 "INSERT INTO solves(user_id,challenge_id) VALUES(?,?)",
@@ -47,13 +61,27 @@ db.run(
 [chall.points,req.session.user.id]
 )
 
-res.send("Correct flag")
+return res.render("challenge",{
+challs:challs,
+message:"✔ Correct Flag! +" + chall.points + " points",
+type:"success"
+})
+
+})
 
 })
 
 }else{
 
-res.send("Wrong flag")
+db.all("SELECT * FROM challenges",(err,challs)=>{
+
+res.render("challenge",{
+challs:challs,
+message:"✖ Wrong Flag",
+type:"error"
+})
+
+})
 
 }
 
