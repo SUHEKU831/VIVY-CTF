@@ -208,3 +208,20 @@ to{
 opacity:1;
 }
 }
+
+/* DOWNLOAD BUTTON */
+
+.download-btn{
+display:inline-block;
+margin-bottom:10px;
+padding:6px 12px;
+background:#00ff9c;
+color:#020617;
+text-decoration:none;
+border-radius:4px;
+font-weight:bold;
+}
+
+.download-btn:hover{
+background:#00cc7a;
+}
