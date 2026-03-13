@@ -1,27 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Challenges</title>
 <link rel="stylesheet" href="/css/style.css">
+</head>
 
-<h1>Challenges</h1>
+<body>
 
+<div class="navbar">
+<h2>⚡ VIVY CTF</h2>
 <a href="/scoreboard">Scoreboard</a>
+</div>
+
+<div class="container">
+
+<h1 class="title">Challenges</h1>
 
 <% challs.forEach(c=>{ %>
 
-<div>
+<div class="card">
 
-<h3><%= c.title %> (<%= c.points %>)</h3>
+<div class="card-header">
+<h3><%= c.title %></h3>
+<span class="points"><%= c.points %> pts</span>
+</div>
 
-<p><%= c.description %></p>
+<p class="desc"><%= c.description %></p>
 
-<form method="POST" action="/challenge/submit">
+<form method="POST" action="/challenge/submit" class="flag-form">
 
 <input type="hidden" name="id" value="<%= c.id %>">
 
-<input name="flag" placeholder="flag">
+<input name="flag" placeholder="Enter flag..." class="flag-input">
 
-<button>Submit</button>
+<button class="submit-btn">Submit</button>
 
 </form>
 
 </div>
 
 <% }) %>
+
+</div>
+
+</body>
+</html>
