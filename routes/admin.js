@@ -19,9 +19,19 @@ cb(null,Date.now()+"-"+file.originalname)
 
 const upload = multer({storage})
 
+/* ADMIN PANEL */
+
 router.get("/",auth,(req,res)=>{
-res.render("admin")
+
+db.all("SELECT * FROM challenges",(err,challs)=>{
+
+res.render("admin",{challs})
+
 })
+
+})
+
+/* ADD CHALLENGE */
 
 router.post("/add",auth,upload.single("file"),(req,res)=>{
 
@@ -38,6 +48,70 @@ db.run(
 `INSERT INTO challenges(title,description,flag_hash,points,category,file)
 VALUES(?,?,?,?,?,?)`,
 [title,description,hash,points,category,file]
+)
+
+res.redirect("/admin")
+
+})
+
+/* EDIT PAGE */
+
+router.get("/edit/:id",auth,(req,res)=>{
+
+db.get(
+"SELECT * FROM challenges WHERE id=?",
+[req.params.id],
+(err,chall)=>{
+
+res.render("edit",{chall})
+
+})
+
+})
+
+/* UPDATE CHALLENGE */
+
+router.post("/edit/:id",auth,upload.single("file"),(req,res)=>{
+
+const {title,description,points,category} = req.body
+
+let file = null
+
+if(req.file){
+file = req.file.filename
+}
+
+if(file){
+
+db.run(
+`UPDATE challenges
+SET title=?,description=?,points=?,category=?,file=?
+WHERE id=?`,
+[title,description,points,category,file,req.params.id]
+)
+
+}else{
+
+db.run(
+`UPDATE challenges
+SET title=?,description=?,points=?,category=?
+WHERE id=?`,
+[title,description,points,category,req.params.id]
+)
+
+}
+
+res.redirect("/admin")
+
+})
+
+/* DELETE CHALLENGE */
+
+router.get("/delete/:id",auth,(req,res)=>{
+
+db.run(
+"DELETE FROM challenges WHERE id=?",
+[req.params.id]
 )
 
 res.redirect("/admin")
