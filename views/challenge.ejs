@@ -33,6 +33,12 @@
 
 <p class="desc"><%= c.description %></p>
 
+<% if(c.file){ %>
+<a href="/files/<%= c.file %>" class="download-btn">
+Download File
+</a>
+<% } %>
+
 <form method="POST" action="/challenge/submit" class="flag-form">
 
 <input type="hidden" name="id" value="<%= c.id %>">
