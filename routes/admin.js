@@ -1,21 +1,29 @@
 const express = require("express")
 const crypto = require("crypto")
+const multer = require("multer")
+const path = require("path")
+
 const db = require("../database")
-const admin = require("../middleware/admin")
+const auth = require("../middleware/auth")
 
 const router = express.Router()
 
-router.get("/",admin,(req,res)=>{
-
-db.all("SELECT * FROM challenges",(err,challs)=>{
-
-res.render("admin",{challs})
-
+const storage = multer.diskStorage({
+destination:(req,file,cb)=>{
+cb(null,"public/files")
+},
+filename:(req,file,cb)=>{
+cb(null,Date.now()+"-"+file.originalname)
+}
 })
 
+const upload = multer({storage})
+
+router.get("/",auth,(req,res)=>{
+res.render("admin")
 })
 
-router.post("/add",admin,(req,res)=>{
+router.post("/add",auth,upload.single("file"),(req,res)=>{
 
 const {title,description,flag,points,category} = req.body
 
@@ -24,9 +32,12 @@ const hash = crypto
 .update(flag)
 .digest("hex")
 
+const file = req.file ? req.file.filename : null
+
 db.run(
-"INSERT INTO challenges(title,description,flag_hash,points,category) VALUES(?,?,?,?,?)",
-[title,description,hash,points,category]
+`INSERT INTO challenges(title,description,flag_hash,points,category,file)
+VALUES(?,?,?,?,?,?)`,
+[title,description,hash,points,category,file]
 )
 
 res.redirect("/admin")
