@@ -23,6 +23,8 @@ app.use("/challenge",require("./routes/challenge"))
 app.use("/admin",require("./routes/admin"))
 app.use("/scoreboard",require("./routes/scoreboard"))
 
-server.listen(3000,()=>{
-console.log("CTF running on port 3000")
+const PORT = process.env.PORT || 3000
+
+app.listen(PORT,"0.0.0.0",()=>{
+console.log("CTF running on",PORT)
 })
