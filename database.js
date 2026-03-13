@@ -1,11 +1,14 @@
 const path = require("path")
 const sqlite3 = require("sqlite3").verbose()
+const bcrypt = require("bcrypt")
 
 const dbPath = path.join(__dirname,"database.db")
 
 const db = new sqlite3.Database(dbPath)
 
 db.serialize(()=>{
+
+/* USERS TABLE */
 
 db.run(`
 CREATE TABLE IF NOT EXISTS users(
@@ -16,6 +19,8 @@ score INTEGER DEFAULT 0,
 isAdmin INTEGER DEFAULT 0
 )
 `)
+
+/* CHALLENGE TABLE */
 
 db.run(`
 CREATE TABLE IF NOT EXISTS challenges(
@@ -28,6 +33,8 @@ category TEXT
 )
 `)
 
+/* SOLVES TABLE */
+
 db.run(`
 CREATE TABLE IF NOT EXISTS solves(
 id INTEGER PRIMARY KEY,
@@ -35,6 +42,24 @@ user_id INTEGER,
 challenge_id INTEGER
 )
 `)
+
+/* AUTO CREATE ADMIN */
+
+db.get("SELECT * FROM users WHERE username='admin'", async (err,row)=>{
+
+if(!row){
+
+const hash = await bcrypt.hash("Elang910",10)
+
+db.run(`
+INSERT INTO users(username,password,isAdmin)
+VALUES(?,?,1)
+`,["admin",hash])
+
+console.log("Admin account created")
+}
+
+})
 
 })
 
