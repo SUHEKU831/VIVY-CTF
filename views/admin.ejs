@@ -47,6 +47,48 @@
 
 </div>
 
+
+<div class="card">
+
+<h3>Existing Challenges</h3>
+
+<table class="score-table">
+
+<tr>
+<th>Title</th>
+<th>Points</th>
+<th>Action</th>
+</tr>
+
+<% challs.forEach(c=>{ %>
+
+<tr>
+
+<td><%= c.title %></td>
+
+<td><%= c.points %></td>
+
+<td>
+
+<a href="/admin/edit/<%= c.id %>">Edit</a>
+
+|
+
+<a href="/admin/delete/<%= c.id %>"
+onclick="return confirm('Delete challenge?')">
+Delete
+</a>
+
+</td>
+
+</tr>
+
+<% }) %>
+
+</table>
+
+</div>
+
 </div>
 
 </body>
