@@ -27,7 +27,7 @@
 
 <h3>Add Challenge</h3>
 
-<form method="POST" action="/admin/add" class="admin-form">
+<form method="POST" action="/admin/add" enctype="multipart/form-data" class="admin-form">
 
 <input name="title" placeholder="Challenge title" required>
 
@@ -38,6 +38,8 @@
 <textarea name="description" placeholder="Challenge description"></textarea>
 
 <input name="flag" placeholder="Flag (example: CTF{flag})" required>
+
+<input type="file" name="file">
 
 <button class="submit-btn">Add Challenge</button>
 
