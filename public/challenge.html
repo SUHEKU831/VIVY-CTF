@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -8,17 +7,31 @@
 
 <body>
 
+<nav>
+
+<h2>⚡ MINI CTF</h2>
+
+<div class="menu">
+<a href="/">Challenges</a>
+<a href="/scoreboard.html">Scoreboard</a>
+</div>
+
+</nav>
+
 <div class="container">
 
 <h1 id="title"></h1>
 
 <p id="desc"></p>
 
-<a id="download">Download File</a>
+<a id="download">
+<button>Download File</button>
+</a>
 
 <h3>Submit Flag</h3>
 
-<input id="flag" placeholder="flag">
+<input id="flag" placeholder="flag{...}">
+
 <button onclick="submit()">Submit</button>
 
 <p id="result"></p>
@@ -30,7 +43,7 @@
 const url=new URLSearchParams(window.location.search)
 const id=url.get("id")
 
-document.getElementById("title").innerText=id
+document.getElementById("title").innerText="Challenge: "+id
 document.getElementById("download").href="/files/"+id+"/file.zip"
 
 fetch("/description/"+id)
