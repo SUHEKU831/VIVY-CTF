@@ -29,7 +29,20 @@
 </div>
 <% } %>
 
-<% challs.forEach(c=>{ %>
+<!-- 🔥 GROUP BY CATEGORY -->
+<%
+let grouped = {}
+challs.forEach(c=>{
+    if(!grouped[c.category]) grouped[c.category] = []
+    grouped[c.category].push(c)
+})
+%>
+
+<% for(let cat in grouped){ %>
+
+<h2 style="margin-top:30px;"><%= cat %></h2>
+
+<% grouped[cat].forEach(c=>{ %>
 
 <div class="card">
 
@@ -38,11 +51,21 @@
 <span class="points"><%= c.points %> pts</span>
 </div>
 
-<p class="desc"><%= c.description %></p>
+<!-- 🔥 DESKRIPSI SUPPORT HTML -->
+<p class="desc"><%- c.description %></p>
 
+<!-- 🔥 FILE DOWNLOAD -->
 <% if(c.file){ %>
 <a href="/files/<%= c.file %>" class="download-btn">
 Download File
+</a>
+<% } %>
+
+<!-- 🔥 LINK SOAL -->
+<% if(c.link){ %>
+<br>
+<a href="<%= c.link %>" target="_blank" class="download-btn">
+Open Link
 </a>
 <% } %>
 
@@ -59,6 +82,8 @@ Download File
 </div>
 
 <% }) %>
+
+<% } %>
 
 </div>
 
