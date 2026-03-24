@@ -54,6 +54,10 @@ challenge_id INTEGER
 )
 `)
 
+db.run(`
+ALTER TABLE challenges ADD COLUMN link TEXT
+`, (err)=>{})
+
 /* ✅ TAMBAH TEAM_ID KE SOLVES */
 db.run(`
 ALTER TABLE solves ADD COLUMN team_id INTEGER
