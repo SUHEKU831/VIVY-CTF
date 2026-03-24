@@ -19,19 +19,12 @@ isAdmin INTEGER DEFAULT 0
 )
 `)
 
-/* CHALLENGE TABLE - DITAMBAH KOLOM FILE */
-db.run(`CREATE TABLE IF NOT EXISTS challenges(
-id INTEGER PRIMARY KEY,
-title TEXT,
-description TEXT,
-flag_hash TEXT,
-points INTEGER,
-category TEXT,
-file TEXT   /* ← KOLOM BARU UNTUK MENYIMPAN NAMA FILE */
-)
-`)
+/* ✅ TAMBAH KOLOM TEAM KE USERS */
+db.run(`
+ALTER TABLE users ADD COLUMN team_id INTEGER
+`, (err)=>{})
 
-/* TEAM TABLE */
+/* ✅ TEAM TABLE */
 db.run(`
 CREATE TABLE IF NOT EXISTS teams(
 id INTEGER PRIMARY KEY,
@@ -39,9 +32,17 @@ name TEXT UNIQUE
 )
 `)
 
-/* USER TEAM */
+/* CHALLENGE TABLE */
 db.run(`
-ALTER TABLE users ADD COLUMN team_id INTEGER DEFAULT NULL
+CREATE TABLE IF NOT EXISTS challenges(
+id INTEGER PRIMARY KEY,
+title TEXT,
+description TEXT,
+flag_hash TEXT,
+points INTEGER,
+category TEXT,
+file TEXT
+)
 `)
 
 /* SOLVES TABLE */
@@ -53,8 +54,15 @@ challenge_id INTEGER
 )
 `)
 
+/* ✅ TAMBAH TEAM_ID KE SOLVES */
+db.run(`
+ALTER TABLE solves ADD COLUMN team_id INTEGER
+`, (err)=>{})
+
 /* AUTO CREATE ADMIN */
-db.get("SELECT * FROM users WHERE username='admin'", async (err,row)=>{if(!row){
+db.get("SELECT * FROM users WHERE username='admin'", async (err,row)=>{
+
+if(!row){
 
 const hash = await bcrypt.hash("Elang910",10)
 
