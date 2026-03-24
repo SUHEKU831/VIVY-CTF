@@ -3,75 +3,69 @@ const sqlite3 = require("sqlite3").verbose()
 const bcrypt = require("bcrypt")
 
 const dbPath = path.join(__dirname,"database.db")
+
 const db = new sqlite3.Database(dbPath)
 
 db.serialize(()=>{
 
-/* ================= USERS ================= */
+/* USERS TABLE */
 db.run(`
 CREATE TABLE IF NOT EXISTS users(
 id INTEGER PRIMARY KEY,
 username TEXT UNIQUE,
 password TEXT,
-team_id INTEGER,
 score INTEGER DEFAULT 0,
 isAdmin INTEGER DEFAULT 0
 )
 `)
 
-/* ================= TEAMS ================= */
-db.run(`
-CREATE TABLE IF NOT EXISTS teams(
+/* CHALLENGE TABLE - DITAMBAH KOLOM FILE */
+db.run(`CREATE TABLE IF NOT EXISTS challenges(
 id INTEGER PRIMARY KEY,
-name TEXT UNIQUE,
-score INTEGER DEFAULT 0
+title TEXT,
+description TEXT,
+flag_hash TEXT,
+points INTEGER,
+category TEXT,
+file TEXT   /* ← KOLOM BARU UNTUK MENYIMPAN NAMA FILE */
 )
 `)
 
-/* ================= CATEGORIES ================= */
+/* TEAM TABLE */
 db.run(`
-CREATE TABLE IF NOT EXISTS categories(
+CREATE TABLE IF NOT EXISTS teams(
 id INTEGER PRIMARY KEY,
 name TEXT UNIQUE
 )
 `)
 
-/* ================= CHALLENGE ================= */
+/* USER TEAM */
 db.run(`
-CREATE TABLE IF NOT EXISTS challenges(
-id INTEGER PRIMARY KEY,
-title TEXT,
-description TEXT,     /* HTML SUPPORTED */
-flag_hash TEXT,
-points INTEGER,
-category_id INTEGER,  /* PAKAI RELASI */
-file TEXT,
-link TEXT             /* LINK DOWNLOAD / SOAL */
-)
+ALTER TABLE users ADD COLUMN team_id INTEGER DEFAULT NULL
 `)
 
-/* ================= SOLVES ================= */
-/* TEAM BASED (ANTI DOUBLE POINT) */
+/* SOLVES TABLE */
 db.run(`
 CREATE TABLE IF NOT EXISTS solves(
 id INTEGER PRIMARY KEY,
-team_id INTEGER,
+user_id INTEGER,
 challenge_id INTEGER
 )
 `)
 
-/* ================= AUTO ADMIN ================= */
-db.get("SELECT * FROM users WHERE username='admin'", async (err,row)=>{
-  if(!row){
-    const hash = await bcrypt.hash("Elang910",10)
+/* AUTO CREATE ADMIN */
+db.get("SELECT * FROM users WHERE username='admin'", async (err,row)=>{if(!row){
 
-    db.run(`
-    INSERT INTO users(username,password,isAdmin)
-    VALUES(?,?,1)
-    `,["admin",hash])
+const hash = await bcrypt.hash("Elang910",10)
 
-    console.log("Admin account created")
-  }
+db.run(`
+INSERT INTO users(username,password,isAdmin)
+VALUES(?,?,1)
+`,["admin",hash])
+
+console.log("Admin account created")
+}
+
 })
 
 })
