@@ -34,28 +34,32 @@ if(!chall) return res.redirect("/challenge")
 
 if(hash === chall.flag_hash){
 
+// 🔥 ambil team_id user (kalau belum ada, pakai user_id sendiri)
+const teamId = req.session.user.team_id || req.session.user.id
+
+// 🔥 CEK: apakah team sudah solve?
 db.get(
-"SELECT * FROM solves WHERE user_id=? AND challenge_id=?",
-[req.session.user.id,id],
+"SELECT * FROM solves WHERE challenge_id=? AND team_id=?",
+[id, teamId],
 (err,row)=>{
 
 db.all("SELECT * FROM challenges",(err,challs)=>{
 
 if(row){
-
 return res.render("challenge",{
 challs:challs,
-message:"⚠ Already solved",
+message:"⚠ Team sudah solve",
 type:"error"
 })
-
 }
 
+// 🔥 SIMPAN solve + team_id
 db.run(
-"INSERT INTO solves(user_id,challenge_id) VALUES(?,?)",
-[req.session.user.id,id]
+"INSERT INTO solves(user_id,challenge_id,team_id) VALUES(?,?,?)",
+[req.session.user.id,id,teamId]
 )
 
+// 🔥 TAMBAH SCORE (hanya sekali per team)
 db.run(
 "UPDATE users SET score = score + ? WHERE id=?",
 [chall.points,req.session.user.id]
