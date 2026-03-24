@@ -2,12 +2,22 @@ const express = require("express")
 const crypto = require("crypto")
 const multer = require("multer")
 const path = require("path")
+const sanitizeHtml = require("sanitize-html") // ✅ TAMBAHAN
 
 const db = require("../database")
 const auth = require("../middleware/auth")
 
 const router = express.Router()
 
+/* ✅ MIDDLEWARE ADMIN */
+function isAdmin(req,res,next){
+    if(req.session.user && req.session.user.isAdmin){
+        return next()
+    }
+    return res.redirect("/")
+}
+
+/* ✅ STORAGE */
 const storage = multer.diskStorage({
 destination:(req,file,cb)=>{
 cb(null,"public/files")
@@ -17,25 +27,41 @@ cb(null,Date.now()+"-"+file.originalname)
 }
 })
 
-const upload = multer({storage})
+/* ✅ VALIDASI FILE */
+const upload = multer({
+storage,
+fileFilter:(req,file,cb)=>{
+    const allowed = [
+        "application/pdf",
+        "text/plain",
+        "application/zip",
+        "application/x-zip-compressed"
+    ]
+
+    if(allowed.includes(file.mimetype)){
+        cb(null,true)
+    }else{
+        cb(null,false)
+    }
+}
+})
 
 /* ADMIN PANEL */
-
-router.get("/",auth,(req,res)=>{
+router.get("/",auth,isAdmin,(req,res)=>{
 
 db.all("SELECT * FROM challenges",(err,challs)=>{
-
 res.render("admin",{challs})
-
 })
 
 })
 
 /* ADD CHALLENGE */
+router.post("/add",auth,isAdmin,upload.single("file"),(req,res)=>{
 
-router.post("/add",auth,upload.single("file"),(req,res)=>{
+let {title,description,flag,points,category,link} = req.body
 
-const {title,description,flag,points,category,link} = req.body  // ✅ TAMBAH LINK
+// ✅ SANITIZE HTML
+description = sanitizeHtml(description)
 
 const hash = crypto
 .createHash("sha256")
@@ -47,7 +73,7 @@ const file = req.file ? req.file.filename : null
 db.run(
 `INSERT INTO challenges(title,description,flag_hash,points,category,file,link)
 VALUES(?,?,?,?,?,?,?)`,
-[title,description,hash,points,category,file,link] // ✅ TAMBAH LINK
+[title,description,hash,points,category,file,link]
 )
 
 res.redirect("/admin")
@@ -55,25 +81,24 @@ res.redirect("/admin")
 })
 
 /* EDIT PAGE */
-
-router.get("/edit/:id",auth,(req,res)=>{
+router.get("/edit/:id",auth,isAdmin,(req,res)=>{
 
 db.get(
 "SELECT * FROM challenges WHERE id=?",
 [req.params.id],
 (err,chall)=>{
-
 res.render("edit",{chall})
-
 })
 
 })
 
 /* UPDATE CHALLENGE */
+router.post("/edit/:id",auth,isAdmin,upload.single("file"),(req,res)=>{
 
-router.post("/edit/:id",auth,upload.single("file"),(req,res)=>{
+let {title,description,points,category,link} = req.body
 
-const {title,description,points,category,link} = req.body // ✅ TAMBAH LINK
+// ✅ SANITIZE HTML
+description = sanitizeHtml(description)
 
 let file = null
 
@@ -106,8 +131,7 @@ res.redirect("/admin")
 })
 
 /* DELETE CHALLENGE */
-
-router.get("/delete/:id",auth,(req,res)=>{
+router.get("/delete/:id",auth,isAdmin,(req,res)=>{
 
 db.run(
 "DELETE FROM challenges WHERE id=?",
