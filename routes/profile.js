@@ -25,4 +25,23 @@ solves:rows
 
 })
 
+
+// ✅ TAMBAHKAN DI SINI
+router.post("/join-team", auth, (req,res)=>{
+    const { team } = req.body
+    const userId = req.session.user.id
+
+    db.get("SELECT * FROM teams WHERE name = ?", [team], (err,row)=>{
+        if(row){
+            db.run("UPDATE users SET team_id=? WHERE id=?", [row.id,userId])
+            return res.redirect("/profile")
+        } else {
+            db.run("INSERT INTO teams(name) VALUES(?)",[team], function(){
+                db.run("UPDATE users SET team_id=? WHERE id=?", [this.lastID,userId])
+                res.redirect("/profile")
+            })
+        }
+    })
+})
+
 module.exports = router
