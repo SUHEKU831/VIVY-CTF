@@ -35,7 +35,7 @@ res.render("admin",{challs})
 
 router.post("/add",auth,upload.single("file"),(req,res)=>{
 
-const {title,description,flag,points,category} = req.body
+const {title,description,flag,points,category,link} = req.body  // ✅ TAMBAH LINK
 
 const hash = crypto
 .createHash("sha256")
@@ -45,9 +45,9 @@ const hash = crypto
 const file = req.file ? req.file.filename : null
 
 db.run(
-`INSERT INTO challenges(title,description,flag_hash,points,category,file)
-VALUES(?,?,?,?,?,?)`,
-[title,description,hash,points,category,file]
+`INSERT INTO challenges(title,description,flag_hash,points,category,file,link)
+VALUES(?,?,?,?,?,?,?)`,
+[title,description,hash,points,category,file,link] // ✅ TAMBAH LINK
 )
 
 res.redirect("/admin")
@@ -73,7 +73,7 @@ res.render("edit",{chall})
 
 router.post("/edit/:id",auth,upload.single("file"),(req,res)=>{
 
-const {title,description,points,category} = req.body
+const {title,description,points,category,link} = req.body // ✅ TAMBAH LINK
 
 let file = null
 
@@ -85,18 +85,18 @@ if(file){
 
 db.run(
 `UPDATE challenges
-SET title=?,description=?,points=?,category=?,file=?
+SET title=?,description=?,points=?,category=?,file=?,link=?
 WHERE id=?`,
-[title,description,points,category,file,req.params.id]
+[title,description,points,category,file,link,req.params.id]
 )
 
 }else{
 
 db.run(
 `UPDATE challenges
-SET title=?,description=?,points=?,category=?
+SET title=?,description=?,points=?,category=?,link=?
 WHERE id=?`,
-[title,description,points,category,req.params.id]
+[title,description,points,category,link,req.params.id]
 )
 
 }
