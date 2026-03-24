@@ -29,16 +29,20 @@
 </div>
 <% } %>
 
-<!-- 🔥 GROUP BY CATEGORY -->
 <%
 let grouped = {}
+
+// grouping + default category
 challs.forEach(c=>{
-    if(!grouped[c.category]) grouped[c.category] = []
-    grouped[c.category].push(c)
+    const cat = c.category || "Misc"
+    if(!grouped[cat]) grouped[cat] = []
+    grouped[cat].push(c)
 })
+
+const categories = Object.keys(grouped)
 %>
 
-<% for(let cat in grouped){ %>
+<% categories.forEach(cat => { %>
 
 <h2 style="margin-top:30px;"><%= cat %></h2>
 
@@ -51,17 +55,17 @@ challs.forEach(c=>{
 <span class="points"><%= c.points %> pts</span>
 </div>
 
-<!-- 🔥 DESKRIPSI SUPPORT HTML -->
+<!-- HTML description -->
 <p class="desc"><%- c.description %></p>
 
-<!-- 🔥 FILE DOWNLOAD -->
+<!-- file -->
 <% if(c.file){ %>
 <a href="/files/<%= c.file %>" class="download-btn">
 Download File
 </a>
 <% } %>
 
-<!-- 🔥 LINK SOAL -->
+<!-- link -->
 <% if(c.link){ %>
 <br>
 <a href="<%= c.link %>" target="_blank" class="download-btn">
@@ -73,7 +77,7 @@ Open Link
 
 <input type="hidden" name="id" value="<%= c.id %>">
 
-<input name="flag" placeholder="Enter flag..." class="flag-input">
+<input name="flag" placeholder="Enter flag..." class="flag-input" required>
 
 <button class="submit-btn">Submit</button>
 
@@ -83,7 +87,7 @@ Open Link
 
 <% }) %>
 
-<% } %>
+<% }) %>
 
 </div>
 
