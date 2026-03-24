@@ -6,7 +6,7 @@ const fs = require("fs")
 const path = require("path")
 
 const app = express()
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT || 3000 // ✅ cukup 1x di sini
 
 // ================= FOLDER =================
 const uploadPath = path.join(__dirname, "uploads")
@@ -23,13 +23,12 @@ app.set("view engine", "ejs")
 
 // ================= FILE UPLOAD =================
 app.use(fileUpload({
-    limits: { fileSize: 1024 * 1024 * 500 }, // 500MB
+    limits: { fileSize: 1024 * 1024 * 500 },
     abortOnLimit: true,
     createParentPath: true
 }))
 
 // ================= PROTECT UPLOAD =================
-// biar file gak bisa dieksekusi (aman dari RCE)
 app.use("/uploads", express.static(uploadPath, {
     setHeaders: (res, filePath) => {
         res.set("Content-Type", "application/octet-stream")
@@ -48,7 +47,6 @@ app.use(session({
 }))
 
 // ================= GLOBAL USER =================
-// biar user bisa dipakai di semua EJS
 app.use((req, res, next) => {
     res.locals.user = req.session.user || null
     next()
@@ -85,7 +83,6 @@ app.use((err, req, res, next) => {
 })
 
 // ================= START SERVER =================
-const PORT = process.env.PORT || 3000
 app.listen(PORT, () => {
     console.log("Server running on port " + PORT)
 })
