@@ -28,6 +28,19 @@
 
 <h3>Score: <%= user.score %></h3>
 
+<!-- ✅ TAMBAHAN TEAM -->
+<h2>Team</h2>
+
+<!-- (opsional tampilkan nama team) -->
+<h3>Team Saat Ini: <%= user.team_name || "Belum punya team" %></h3>
+
+<form method="POST" action="/profile/join-team">
+    <input name="team" placeholder="Nama Team" required>
+    <button>Join / Create Team</button>
+</form>
+
+<br>
+
 <h2>Solved Challenges</h2>
 
 <table class="score-table">
